@@ -86,7 +86,7 @@ Available commands: `/scrape-all` `/search-articles` `/add-source` `/cleanup-old
 ## File Structure
 
 ```
-news-analyzer/
+scraper-ar/
 ├── CLAUDE.md
 ├── tabla sources de Supabase
 ├── index.html        ← frontend (single file, no build tools)
