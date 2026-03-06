@@ -5,14 +5,10 @@
 - Generates semantic embeddings for similarity search
 - Plain HTML frontend to search and filter articles
 
-## Stack
-
-- **Frontend:** HTML + Vanilla JS + Supabase JS (CDN)
-- **Scraping:** Node.js + rss-parser + cheerio
-- **AI:** Claude Haiku (categorization) + multilingual embeddings
-- **DB:** Supabase (PostgreSQL + pgvector)
-
-## Usage
+- HTML + Vanilla JS + Supabase JS (CDN)
+- Node.js + rss-parser + cheerio
+- Claude Haiku (categorization) + multilingual embeddings
+- Supabase (PostgreSQL + pgvector)
 
 ```bash
 npm run scrape      # scrape all sources
