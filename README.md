@@ -1,10 +1,6 @@
 # scraper-ar
 
-Experiment with Claude Code — Argentine sports news scraper and analyzer.
-
-## What it does
-
-- Scrapes RSS feeds from AR sports sources
+- Scrapes RSS feeds from sources
 - Categorizes articles using Claude Haiku
 - Generates semantic embeddings for similarity search
 - Plain HTML frontend to search and filter articles
