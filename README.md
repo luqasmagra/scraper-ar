@@ -1,27 +1,27 @@
 # scraper-ar
 
-Experimento con Claude Code — scraper de noticias deportivas argentinas.
+Experiment with Claude Code — Argentine sports news scraper and analyzer.
 
-## Qué hace
+## What it does
 
-- Scrapea fuentes RSS de deportes AR
-- Categoriza artículos con Claude Haiku
-- Genera embeddings semánticos para búsqueda por similitud
-- Frontend en HTML puro para buscar y filtrar artículos
+- Scrapes RSS feeds from AR sports sources
+- Categorizes articles using Claude Haiku
+- Generates semantic embeddings for similarity search
+- Plain HTML frontend to search and filter articles
 
 ## Stack
 
 - **Frontend:** HTML + Vanilla JS + Supabase JS (CDN)
 - **Scraping:** Node.js + rss-parser + cheerio
-- **IA:** Claude Haiku (categorización) + embeddings multilingües
+- **AI:** Claude Haiku (categorization) + multilingual embeddings
 - **DB:** Supabase (PostgreSQL + pgvector)
 
-## Uso
+## Usage
 
 ```bash
-npm run scrape      # scrapea todas las fuentes
-npm run embed       # genera embeddings pendientes
-npm run search <q>  # búsqueda semántica por CLI
+npm run scrape      # scrape all sources
+npm run embed       # generate pending embeddings
+npm run search <q>  # semantic search via CLI
 ```
 
-Abrir `index.html` en el browser para la interfaz web.
+Open `index.html` in the browser for the web interface.
