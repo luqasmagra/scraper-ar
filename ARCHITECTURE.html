@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arquitectura del Proyecto</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 40px 24px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.6rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 48px;
+    }
+
+    .diagram {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    /* ZONAS */
+    .zone {
+      width: 100%;
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+    }
+
+    .zone-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+      opacity: 0.6;
+    }
+
+    .zone-internet  { background: #12191f; border: 1px solid #1e3a52; }
+    .zone-browser   { background: #131a13; border: 1px solid #1e4a1e; }
+    .zone-database  { background: #131319; border: 1px solid #2a2a4a; }
+    .zone-cli       { background: #1a1319; border: 1px solid #3a1a3a; }
+
+    /* NODOS */
+    .nodes {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .node {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 14px 18px;
+      min-width: 140px;
+      text-align: center;
+      border: 1px solid #2a2a2a;
+      position: relative;
+    }
+
+    .node-icon { font-size: 1.8rem; margin-bottom: 6px; }
+
+    .node-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .node-desc {
+      font-size: 0.72rem;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    /* colores por zona */
+    .zone-internet .node  { border-color: #1e3a52; }
+    .zone-browser  .node  { border-color: #1e4a1e; }
+    .zone-database .node  { border-color: #2a2a4a; }
+    .zone-cli      .node  { border-color: #3a1a3a; }
+
+    /* FLECHAS */
+    .arrow-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 4px 0;
+      width: 100%;
+    }
+
+    .arrow-line {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 16px;
+    }
+
+    .arrow-stem {
+      width: 2px;
+      height: 20px;
+      background: #333;
+      margin: 0 auto;
+    }
+
+    .arrow-head {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 10px solid #333;
+      margin: 0 auto;
+    }
+
+    .arrow-label {
+      font-size: 0.72rem;
+      color: #555;
+      text-align: center;
+      padding: 2px 10px;
+      background: #1a1a1a;
+      border-radius: 20px;
+      border: 1px solid #2a2a2a;
+      white-space: nowrap;
+    }
+
+    .arrows-row {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      padding: 0 40px;
+      gap: 8px;
+    }
+
+    .arrow-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    /* LEYENDA */
+    .legend {
+      max-width: 720px;
+      margin: 40px auto 0;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: #666;
+    }
+
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+
+    .step-badge {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 20px;
+      padding: 1px 10px;
+      font-size: 0.65rem;
+      color: #888;
+      white-space: nowrap;
+    }
+
+    .flow-title {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #555;
+      margin: 32px 0 16px;
+    }
+
+    .two-flows {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .flow-card {
+      background: #141414;
+      border-radius: 14px;
+      padding: 20px;
+      border: 1px solid #222;
+    }
+
+    .flow-card-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .step-num {
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-num.blue  { background: #1e3a5f; color: #4f8ef7; }
+    .step-num.green { background: #1a3a1a; color: #4caf50; }
+
+    .step-text {
+      font-size: 0.8rem;
+      color: #aaa;
+      line-height: 1.4;
+      padding-top: 2px;
+    }
+
+    .step-text strong { color: #fff; }
+
+    .vdivider {
+      width: 1px;
+      background: #1e1e1e;
+      align-self: stretch;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>¿Cómo funciona el proyecto?</h1>
+  <p class="subtitle">Buscador de noticias deportivas argentinas</p>
+
+  <!-- COMPONENTES -->
+  <div class="diagram">
+
+    <!-- Internet -->
+    <div class="zone zone-internet" style="width:100%; max-width:720px;">
+      <div class="zone-label">🌍 Internet — fuentes externas</div>
+      <div class="nodes">
+        <div class="node">
+          <div class="node-icon">📰</div>
+          <div class="node-title">RSS de noticias</div>
+          <div class="node-desc">ESPN AR · Clarín · La Nación<br>Publican artículos automáticamente</div>
+        </div>
+        <div class="node">
+          <div class="node-icon">🤖</div>
+          <div class="node-title">Claude AI</div>
+          <div class="node-desc">Lee cada artículo y escribe<br>un resumen + categoría</div>
+        </div>
+        <div class="node">
+          <div class="node-icon">📦</div>
+          <div class="node-title">Modelo de lenguaje</div>
+          <div class="node-desc">Se descarga la primera vez.<br>Luego funciona sin internet.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-stem"></div>
+    <div class="arrow-head"></div>
+
+    <!-- CLI -->
+    <div class="zone zone-cli" style="width:100%; max-width:720px;">
+      <div class="zone-label">⚙️ Scripts — se ejecutan desde la terminal</div>
+      <div class="nodes">
+        <div class="node">
+          <div class="node-icon">🕷️</div>
+          <div class="node-title">Scraper</div>
+          <div class="node-desc">Va a cada fuente y descarga<br>los artículos nuevos</div>
+        </div>
+        <div class="node">
+          <div class="node-icon">🏷️</div>
+          <div class="node-title">Categorizador</div>
+          <div class="node-desc">Usa Claude AI para etiquetar<br>cada artículo (Fútbol, Tenis…)</div>
+        </div>
+        <div class="node">
+          <div class="node-icon">🧮</div>
+          <div class="node-title">Generador de índice</div>
+          <div class="node-desc">Convierte el texto en números<br>para que el buscador entienda el significado</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-stem"></div>
+    <div class="arrow-head"></div>
+
+    <!-- Base de datos -->
+    <div class="zone zone-database" style="width:100%; max-width:720px;">
+      <div class="zone-label">🗄️ Base de datos — almacenamiento</div>
+      <div class="nodes">
+        <div class="node">
+          <div class="node-icon">📋</div>
+          <div class="node-title">Fuentes</div>
+          <div class="node-desc">Lista de sitios configurados<br>para scrapear</div>
+        </div>
+        <div class="node">
+          <div class="node-icon">📚</div>
+          <div class="node-title">Artículos</div>
+          <div class="node-desc">Título · Resumen · Link · Categoría<br>+ índice de significado</div>
+        </div>
+        <div class="node">
+          <div class="node-icon">🔍</div>
+          <div class="node-title">Buscador interno</div>
+          <div class="node-desc">Compara lo que escribís<br>con el índice y devuelve resultados</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-stem"></div>
+    <div class="arrow-head"></div>
+
+    <!-- Browser -->
+    <div class="zone zone-browser" style="width:100%; max-width:720px;">
+      <div class="zone-label">🌐 Navegador — lo que ves vos</div>
+      <div class="nodes">
+        <div class="node">
+          <div class="node-icon">🖥️</div>
+          <div class="node-title">Interfaz de búsqueda</div>
+          <div class="node-desc">Escribís lo que querés buscar<br>y filtrás por deporte</div>
+        </div>
+        <div class="node">
+          <div class="node-icon">⚡</div>
+          <div class="node-title">Procesador de queries</div>
+          <div class="node-desc">Convierte tu búsqueda en números<br>directamente en tu navegador</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FLUJOS -->
+  <p class="flow-title">¿Qué pasa cuando...?</p>
+  <div class="two-flows">
+
+    <div class="flow-card">
+      <div class="flow-card-title">🕷️ Actualizás las noticias</div>
+      <div class="flow-step">
+        <div class="step-num green">1</div>
+        <div class="step-text">El <strong>scraper</strong> va a ESPN, Clarín y La Nación y descarga los artículos nuevos</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num green">2</div>
+        <div class="step-text"><strong>Claude AI</strong> lee cada artículo y genera un resumen y una categoría</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num green">3</div>
+        <div class="step-text">El <strong>generador de índice</strong> convierte el texto en números que representan su significado</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num green">4</div>
+        <div class="step-text">Todo se guarda en la <strong>base de datos</strong></div>
+      </div>
+    </div>
+
+    <div class="flow-card">
+      <div class="flow-card-title">🔍 Buscás un artículo</div>
+      <div class="flow-step">
+        <div class="step-num blue">1</div>
+        <div class="step-text">Escribís tu búsqueda en el <strong>navegador</strong>, por ejemplo "gol de tiro libre"</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num blue">2</div>
+        <div class="step-text">Tu navegador convierte esa frase en <strong>números</strong> que representan su significado</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num blue">3</div>
+        <div class="step-text">La <strong>base de datos</strong> compara esos números con el índice de todos los artículos</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num blue">4</div>
+        <div class="step-text">Te muestra los artículos <strong>más parecidos</strong> a lo que buscaste, con su link</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LEYENDA -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#4caf50"></div> Flujo de actualización (terminal)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#4f8ef7"></div> Flujo de búsqueda (navegador)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div> Procesamiento con IA</div>
+  </div>
+
+</body>
+</html>

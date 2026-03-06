@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscador Deportivo AR</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #1a1a1a;
+      border-bottom: 1px solid #2a2a2a;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header h1 { font-size: 1.2rem; font-weight: 600; color: #fff; }
+
+    header span {
+      font-size: 0.75rem; color: #666;
+      background: #2a2a2a; padding: 2px 8px; border-radius: 20px;
+    }
+
+    #model-status {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    .search-section {
+      padding: 40px 24px 24px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .search-box { display: flex; gap: 10px; }
+
+    .search-box input {
+      flex: 1;
+      background: #1a1a1a; border: 1px solid #333; border-radius: 8px;
+      padding: 14px 18px; font-size: 1rem; color: #fff; outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-box input:focus { border-color: #4f8ef7; }
+    .search-box input::placeholder { color: #555; }
+
+    .search-box button {
+      background: #4f8ef7; border: none; border-radius: 8px;
+      padding: 14px 24px; font-size: 1rem; font-weight: 600;
+      color: #fff; cursor: pointer; transition: background 0.2s; white-space: nowrap;
+    }
+    .search-box button:hover { background: #3a7be0; }
+    .search-box button:disabled { background: #2a4a80; cursor: not-allowed; }
+
+    .filters {
+      margin-top: 14px; display: flex; gap: 8px;
+      flex-wrap: wrap; align-items: center;
+    }
+    .filters label { font-size: 0.8rem; color: #666; }
+
+    .cat-btn {
+      background: #1a1a1a; border: 1px solid #333; border-radius: 20px;
+      padding: 4px 14px; font-size: 0.8rem; color: #aaa;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .cat-btn:hover { border-color: #555; color: #fff; }
+    .cat-btn.active { background: #4f8ef7; border-color: #4f8ef7; color: #fff; }
+
+    .results-section {
+      max-width: 800px; margin: 0 auto; padding: 0 24px 40px;
+    }
+
+    .results-header { font-size: 0.85rem; color: #666; margin-bottom: 16px; }
+    .results-header strong { color: #aaa; }
+
+    .result-card {
+      background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px;
+      padding: 16px 20px; margin-bottom: 12px; transition: border-color 0.15s;
+    }
+    .result-card:hover { border-color: #444; }
+
+    .result-meta {
+      display: flex; gap: 8px; align-items: center; margin-bottom: 8px;
+    }
+
+    .category-badge {
+      font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+      background: #1e3a5f; color: #4f8ef7;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+
+    .similarity { font-size: 0.75rem; color: #555; }
+    .result-date { font-size: 0.75rem; color: #555; margin-left: auto; }
+
+    .result-title {
+      font-size: 1rem; font-weight: 600; color: #fff;
+      margin-bottom: 6px; line-height: 1.4;
+    }
+    .result-title a { color: inherit; text-decoration: none; }
+    .result-title a:hover { color: #4f8ef7; }
+
+    .result-summary {
+      font-size: 0.875rem; color: #888; line-height: 1.5; margin-bottom: 10px;
+    }
+
+    .result-url {
+      font-size: 0.75rem; color: #4f8ef7; text-decoration: none;
+      opacity: 0.7; word-break: break-all;
+    }
+    .result-url:hover { opacity: 1; }
+
+    .state { text-align: center; padding: 60px 20px; color: #555; }
+    .state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .state p { font-size: 0.95rem; }
+
+    .spinner {
+      display: inline-block; width: 20px; height: 20px;
+      border: 2px solid #333; border-top-color: #4f8ef7;
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+      vertical-align: middle; margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Buscador Deportivo AR</h1>
+  <span id="article-count">cargando...</span>
+  <span id="model-status">Cargando modelo...</span>
+</header>
+
+<div class="search-section">
+  <div class="search-box">
+    <input type="text" id="query"
+      placeholder="Ej: goles de tiro libre, selección argentina, Colapinto F1..."
+      autofocus>
+    <button id="btn-search" disabled>Buscar</button>
+  </div>
+  <div class="filters">
+    <label>Filtrar por:</label>
+    <button class="cat-btn active" data-cat="">Todos</button>
+  </div>
+</div>
+
+<div class="results-section">
+  <div id="results-header" class="results-header" style="display:none"></div>
+  <div id="results"></div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+  import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js';
+
+  // --- Config ---
+  // ⚠️ Replace with your own Supabase project credentials
+  // Find them at: https://supabase.com/dashboard → Project Settings → API
+  const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+  const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  // --- Estado ---
+  let embedder     = null;
+  let activeCategory = '';
+  let lastQuery    = '';
+
+  // --- Cargar modelo de embeddings (con limpieza de caché si cambió la versión) ---
+  const MODEL_NAME    = 'Xenova/multilingual-e5-small';
+  const MODEL_VERSION = 'v1'; // incrementar acá si se cambia el modelo
+
+  async function clearOldModelCache() {
+    const stored = localStorage.getItem('model_version');
+    if (stored === MODEL_VERSION) return;
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+    localStorage.setItem('model_version', MODEL_VERSION);
+  }
+
+  (async () => {
+    await clearOldModelCache();
+    embedder = await pipeline('feature-extraction', MODEL_NAME);
+    document.getElementById('model-status').textContent = 'Modelo listo';
+    document.getElementById('btn-search').disabled = false;
+  })();
+
+  // --- Generar embedding ---
+  async function embed(text) {
+    const out = await embedder(text, { pooling: 'mean', normalize: true });
+    return Array.from(out.data);
+  }
+
+  // --- Búsqueda semántica via RPC ---
+  async function search(query) {
+    if (!query || !embedder) return;
+    lastQuery = query;
+
+    const resultsEl = document.getElementById('results');
+    const headerEl  = document.getElementById('results-header');
+    const btn = document.getElementById('btn-search');
+
+    btn.disabled = true;
+    headerEl.style.display = 'none';
+    resultsEl.innerHTML = `<div class="state"><div class="spinner"></div> Buscando...</div>`;
+
+    try {
+      const embedding = await embed(`query: ${query}`);
+
+      const { data, error } = await supabase.rpc('search_articles', {
+        query_embedding:  embedding,
+        match_threshold:  0.3,
+        match_count:      15,
+        filter_category:  activeCategory || null,
+      });
+
+      if (error) throw error;
+      renderResults(data || [], query);
+    } catch (err) {
+      resultsEl.innerHTML = `<div class="state"><div class="icon">⚠️</div><p>Error: ${err.message}</p></div>`;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // --- Render ---
+  function formatDate(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  function simColor(sim) {
+    if (sim > 0.6) return '#4caf50';
+    if (sim > 0.45) return '#ff9800';
+    return '#888';
+  }
+
+  function renderResults(results, query) {
+    const resultsEl = document.getElementById('results');
+    const headerEl  = document.getElementById('results-header');
+    headerEl.style.display = 'block';
+
+    if (!results.length) {
+      headerEl.textContent = '';
+      resultsEl.innerHTML = `<div class="state"><div class="icon">🔍</div><p>Sin resultados${activeCategory ? ' en <strong>' + activeCategory + '</strong>' : ''} para "<strong>${query}</strong>".</p></div>`;
+      return;
+    }
+
+    headerEl.innerHTML = `<strong>${results.length}</strong> resultado${results.length !== 1 ? 's' : ''} para "<strong>${query}</strong>"${activeCategory ? ' en <strong>' + activeCategory + '</strong>' : ''}`;
+
+    resultsEl.innerHTML = results.map(r => `
+      <div class="result-card">
+        <div class="result-meta">
+          <span class="category-badge">${r.category || 'Deportes'}</span>
+          <span class="similarity" style="color:${simColor(r.similarity)}">${(r.similarity * 100).toFixed(0)}% relevancia</span>
+          <span class="result-date">${formatDate(r.published_at)}</span>
+        </div>
+        <div class="result-title">
+          <a href="${r.url}" target="_blank" rel="noopener">${r.title}</a>
+        </div>
+        ${r.summary ? `<div class="result-summary">${r.summary}</div>` : ''}
+        <a class="result-url" href="${r.url}" target="_blank" rel="noopener">${r.url}</a>
+      </div>
+    `).join('');
+  }
+
+  // --- Categorías ---
+  async function loadCategories() {
+    const { data } = await supabase
+      .from('articles')
+      .select('category')
+      .not('category', 'is', null);
+
+    const counts = {};
+    for (const row of data || []) {
+      counts[row.category] = (counts[row.category] || 0) + 1;
+    }
+
+    const filters = document.querySelector('.filters');
+    let total = 0;
+    Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .forEach(([name, count]) => {
+        total += count;
+        const btn = document.createElement('button');
+        btn.className = 'cat-btn';
+        btn.dataset.cat = name;
+        btn.textContent = `${name} (${count})`;
+        filters.appendChild(btn);
+      });
+
+    document.getElementById('article-count').textContent = `${total} artículos`;
+  }
+
+  // --- Eventos ---
+  document.querySelector('.filters').addEventListener('click', (e) => {
+    const btn = e.target.closest('.cat-btn');
+    if (!btn) return;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCategory = btn.dataset.cat;
+    if (lastQuery) search(lastQuery);
+  });
+
+  document.getElementById('btn-search').addEventListener('click', () => {
+    const q = document.getElementById('query').value.trim();
+    if (q) search(q);
+  });
+
+  document.getElementById('query').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const q = e.target.value.trim();
+      if (q) search(q);
+    }
+  });
+
+  loadCategories();
+</script>
+</body>
+</html>

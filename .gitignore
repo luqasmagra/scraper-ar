@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Environment variables — NEVER commit
+.env
+.env.local
+.env.*
+
+# Claude memory (local only)
+.claude/settings.local.json
+
+# Local notes with credentials
+notes.md
