@@ -1,4 +1,53 @@
 // Categorización por keywords
+const CATEGORIES = {
+  'Fútbol': [
+    'fútbol', 'futbol', 'gol', 'liga', 'copa', 'selección', 'seleccion',
+    'argentina', 'river', 'boca', 'racing', 'independiente', 'san lorenzo',
+    'huracán', 'vélez', 'estudiantes', 'talleres', 'belgrano', 'newells',
+    'rosario central', 'premier league', 'champions', 'laliga', 'serie a',
+    'eliminatorias', 'mundial', 'dt', 'técnico', 'entrenador', 'delantero',
+    'defensor', 'portero', 'arquero', 'fixture', 'clásico', 'superclásico',
+    'goleador', 'transferencia', 'pase', 'contrato', 'mercado de pases',
+    'messi', 'di maría', 'lautaro', 'julián álvarez', 'dybala', 'de paul',
+  ],
+  'Tenis': [
+    'tenis', 'atp', 'wta', 'grand slam', 'wimbledon', 'roland garros',
+    'us open', 'australian open', 'djokovic', 'alcaraz', 'nadal', 'federer',
+    'set', 'match', 'break', 'slam', 'ranking atp', 'ranking wta',
+    'schwartzman', 'pella', 'zeballos', 'pereira',
+  ],
+  'Básquet': [
+    'básquet', 'basquet', 'basketball', 'nba', 'liga nacional', 'fiba',
+    'americup', 'la liga argentina', 'triple', 'enceste', 'rebote',
+    'facundo campazzo', 'luca vildoza', 'nicolas laprovittola', 'peñarol',
+    'instituto', 'regatas', 'san lorenzo básquet',
+  ],
+  'Rugby': [
+    'rugby', 'los pumas', 'pumas', 'six nations', 'rugby championship',
+    'world rugby', 'scrum', 'tackle', 'try', 'uar', 'unión argentina',
+    'super rugby', 'buenos aires cricket', 'leandro desio',
+  ],
+  'Automovilismo': [
+    'formula 1', 'fórmula 1', 'f1', 'moto gp', 'rally', 'tc2000',
+    'turismo carretera', 'verstappen', 'hamilton', 'sainz', 'leclerc',
+    'colapinto', 'pitstop', 'clasificación', 'gran premio', 'circuito',
+    'ferrari', 'mercedes', 'red bull racing',
+  ],
+  'Boxeo': [
+    'boxeo', 'box', 'pelea', 'combate', 'nocaut', 'ko', 'tko',
+    'campeonato mundial', 'wbc', 'wba', 'ibf', 'peso pesado', 'peso ligero',
+    'maravilla martínez', 'charlo', 'canelo',
+  ],
+  'Atletismo': [
+    'atletismo', 'maratón', 'maraton', 'velocidad', 'salto', 'lanzamiento',
+    'juegos olímpicos', 'olimpiadas', 'paris 2024', 'los angeles 2028',
+    'record mundial', 'medalla de oro', 'podio',
+  ],
+  'Hockey': [
+    'hockey', 'las leonas', 'los leones', 'palo', 'stick', 'pro league',
+    'champions trophy', 'aymar', 'retegui',
+  ],
+};
 
 const ALL_KEYWORDS = Object.entries(CATEGORIES).flatMap(([cat, kws]) =>
   kws.map((kw) => ({ kw: kw.toLowerCase(), cat })),
