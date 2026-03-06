@@ -11,7 +11,7 @@ export async function semanticSearch(query, { limit = 10, category } = {}) {
   const { data, error } = await supabase.rpc('search_articles', {
     query_embedding: embedding,
     match_threshold: 0.3,
-    match_count:     limit,
+    match_count: limit,
     filter_category: category || null,
   });
 
@@ -44,7 +44,9 @@ export function printResults(results) {
   console.log(`\n${results.length} resultado(s):\n`);
   results.forEach((r, i) => {
     const sim = r.similarity ? ` [${(r.similarity * 100).toFixed(1)}%]` : '';
-    const date = r.published_at ? new Date(r.published_at).toLocaleDateString('es-AR') : '';
+    const date = r.published_at
+      ? new Date(r.published_at).toLocaleDateString('es-AR')
+      : '';
     console.log(`${i + 1}. [${r.category || '?'}]${sim} ${r.title}`);
     if (r.summary) console.log(`   ${r.summary}`);
     console.log(`   ${r.url}  ${date}\n`);

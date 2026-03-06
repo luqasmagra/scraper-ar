@@ -1,6 +1,7 @@
 Run a full scrape of all active news sources.
 
 Steps:
+
 1. Query the Supabase `sources` table to get all configured sources
 2. For each source:
    a. Fetch the RSS/HTML feed
@@ -13,6 +14,7 @@ Steps:
    - Z errors (list source names that failed)
 
 Constraints:
+
 - Do not touch index.html or tabla sources de Supabase
 - Do not modify DB schema
 - Deduplicate by URL before every insert

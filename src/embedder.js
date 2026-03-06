@@ -5,8 +5,13 @@ let embedder = null;
 
 async function getEmbedder() {
   if (!embedder) {
-    console.log('  Cargando modelo de embeddings (primera vez puede tardar)...');
-    embedder = await pipeline('feature-extraction', 'Xenova/multilingual-e5-small');
+    console.log(
+      '  Cargando modelo de embeddings (primera vez puede tardar)...',
+    );
+    embedder = await pipeline(
+      'feature-extraction',
+      'Xenova/multilingual-e5-small',
+    );
     console.log('  Modelo listo.');
   }
   return embedder;
@@ -14,7 +19,10 @@ async function getEmbedder() {
 
 export async function generateEmbedding(text, type = 'passage') {
   const model = await getEmbedder();
-  const output = await model(`${type}: ${text}`, { pooling: 'mean', normalize: true });
+  const output = await model(`${type}: ${text}`, {
+    pooling: 'mean',
+    normalize: true,
+  });
   return Array.from(output.data);
 }
 
@@ -48,7 +56,10 @@ export async function embedPendingArticles(batchSize = 20) {
       .eq('id', article.id);
 
     if (updateErr) {
-      console.error(`  Error embedding artículo ${article.id}:`, updateErr.message);
+      console.error(
+        `  Error embedding artículo ${article.id}:`,
+        updateErr.message,
+      );
     } else {
       count++;
       process.stdout.write(`\r  Progreso: ${count}/${articles.length}`);

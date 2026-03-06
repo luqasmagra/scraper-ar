@@ -46,11 +46,11 @@ These rules are non-negotiable and apply to every single action taken in this pr
 7. **If something is ambiguous, ask ONE clarifying question before acting.**
    Do not make assumptions and do not proceed with guesses.
 
-9. **When verifying external URLs or feeds, try ONCE only.**
+8. **When verifying external URLs or feeds, try ONCE only.**
    If the fetch fails for any reason, discard that source and move on.
    Never retry in a loop or search recursively for alternative URLs.
 
-8. **ALWAYS ask for explicit confirmation before any architectural change using AskUserQuestion.**
+9. **ALWAYS ask for explicit confirmation before any architectural change using AskUserQuestion.**
    An architectural change includes: adding/removing files, adding dependencies,
    changing how components communicate, modifying DB schema, switching libraries,
    or changing the search/scraping approach.
@@ -64,13 +64,13 @@ These rules are non-negotiable and apply to every single action taken in this pr
 Agent definitions live in `.claude/agents/`. Commands live in `.claude/commands/`.
 Only one agent acts at a time. Select the agent based on the trigger.
 
-| Agent | Trigger keywords |
-|---|---|
-| `scraper` | "scrape", "fetch sources", "pull news", "update articles" |
-| `database-manager` | "create table", "migrate", "fix schema", "add column", "query DB" |
+| Agent                | Trigger keywords                                                                 |
+| -------------------- | -------------------------------------------------------------------------------- |
+| `scraper`            | "scrape", "fetch sources", "pull news", "update articles"                        |
+| `database-manager`   | "create table", "migrate", "fix schema", "add column", "query DB"                |
 | `frontend-developer` | "fix UI", "update the search", "change the layout", "add filter", "frontend bug" |
-| `debugger` | "error", "bug", "broken", "not working", "fix this" |
-| `reporter` | "how many articles", "stats", "summary", "what do we have" |
+| `debugger`           | "error", "bug", "broken", "not working", "fix this"                              |
+| `reporter`           | "how many articles", "stats", "summary", "what do we have"                       |
 
 Available commands: `/scrape-all` `/search-articles` `/add-source` `/cleanup-old` `/debug-fix` `/status`
 

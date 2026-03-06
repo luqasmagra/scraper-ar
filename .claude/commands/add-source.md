@@ -1,10 +1,12 @@
 Add a new news source to the project.
 
 Input: $ARGUMENTS (format: "name | url | type | category")
+
 - type: rss or html
 - category: e.g. tech, politics, science, sports
 
 Steps:
+
 1. Parse the input to extract name, url, type, category
 2. Check if the URL already exists in Supabase — if so, stop and report duplicate
 3. If type is `rss`: fetch the URL once to verify it is a valid feed

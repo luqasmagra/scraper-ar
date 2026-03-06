@@ -3,6 +3,7 @@ Search for articles by keyword or category.
 Input: $ARGUMENTS (keyword or category name)
 
 Steps:
+
 1. Query Supabase `articles` table:
    - If input looks like a category: WHERE category = '$ARGUMENTS'
    - Otherwise: WHERE title ILIKE '%$ARGUMENTS%' OR summary ILIKE '%$ARGUMENTS%'

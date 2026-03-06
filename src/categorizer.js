@@ -1,58 +1,7 @@
-// Categorización por keywords (sin API key)
-// Cuando ANTHROPIC_API_KEY esté disponible, usa Claude para mayor precisión.
-
-const CATEGORIES = {
-  'Fútbol': [
-    'fútbol', 'futbol', 'gol', 'liga', 'copa', 'selección', 'seleccion',
-    'argentina', 'river', 'boca', 'racing', 'independiente', 'san lorenzo',
-    'huracán', 'vélez', 'estudiantes', 'talleres', 'belgrano', 'newells',
-    'rosario central', 'premier league', 'champions', 'laliga', 'serie a',
-    'eliminatorias', 'mundial', 'dt', 'técnico', 'entrenador', 'delantero',
-    'defensor', 'portero', 'arquero', 'fixture', 'clásico', 'superclásico',
-    'goleador', 'transferencia', 'pase', 'contrato', 'mercado de pases',
-    'messi', 'di maría', 'lautaro', 'julián álvarez', 'dybala', 'de paul',
-  ],
-  'Tenis': [
-    'tenis', 'atp', 'wta', 'grand slam', 'wimbledon', 'roland garros',
-    'us open', 'australian open', 'djokovic', 'alcaraz', 'nadal', 'federer',
-    'set', 'match', 'break', 'slam', 'ranking atp', 'ranking wta',
-    'schwartzman', 'pella', 'zeballos', 'pereira',
-  ],
-  'Básquet': [
-    'básquet', 'basquet', 'basketball', 'nba', 'liga nacional', 'fiba',
-    'americup', 'la liga argentina', 'triple', 'enceste', 'rebote',
-    'facundo campazzo', 'luca vildoza', 'nicolas laprovittola', 'peñarol',
-    'instituto', 'regatas', 'san lorenzo básquet',
-  ],
-  'Rugby': [
-    'rugby', 'los pumas', 'pumas', 'six nations', 'rugby championship',
-    'world rugby', 'scrum', 'tackle', 'try', 'uar', 'unión argentina',
-    'super rugby', 'buenos aires cricket', 'leandro desio',
-  ],
-  'Automovilismo': [
-    'formula 1', 'fórmula 1', 'f1', 'moto gp', 'rally', 'tc2000',
-    'turismo carretera', 'verstappen', 'hamilton', 'sainz', 'leclerc',
-    'colapinto', 'pitstop', 'clasificación', 'gran premio', 'circuito',
-    'ferrari', 'mercedes', 'red bull racing',
-  ],
-  'Boxeo': [
-    'boxeo', 'box', 'pelea', 'combate', 'nocaut', 'ko', 'tko',
-    'campeonato mundial', 'wbc', 'wba', 'ibf', 'peso pesado', 'peso ligero',
-    'maravilla martínez', 'charlo', 'canelo',
-  ],
-  'Atletismo': [
-    'atletismo', 'maratón', 'maraton', 'velocidad', 'salto', 'lanzamiento',
-    'juegos olímpicos', 'olimpiadas', 'paris 2024', 'los angeles 2028',
-    'record mundial', 'medalla de oro', 'podio',
-  ],
-  'Hockey': [
-    'hockey', 'las leonas', 'los leones', 'palo', 'stick', 'pro league',
-    'champions trophy', 'aymar', 'retegui',
-  ],
-};
+// Categorización por keywords
 
 const ALL_KEYWORDS = Object.entries(CATEGORIES).flatMap(([cat, kws]) =>
-  kws.map((kw) => ({ kw: kw.toLowerCase(), cat }))
+  kws.map((kw) => ({ kw: kw.toLowerCase(), cat })),
 );
 
 export function categorizeByKeywords(title = '', content = '') {
@@ -61,7 +10,8 @@ export function categorizeByKeywords(title = '', content = '') {
 
   for (const { kw, cat } of ALL_KEYWORDS) {
     if (text.includes(kw)) {
-      scores[cat] = (scores[cat] || 0) + (title.toLowerCase().includes(kw) ? 3 : 1);
+      scores[cat] =
+        (scores[cat] || 0) + (title.toLowerCase().includes(kw) ? 3 : 1);
     }
   }
 
@@ -90,7 +40,7 @@ export function simpleSummary(content = '') {
   return sentences.slice(0, 2).join(' ').slice(0, 300) || null;
 }
 
-// Claude categorizer (usa esto cuando tengas ANTHROPIC_API_KEY)
+// Claude categorizer + summarizer (requiere ANTHROPIC_API_KEY)
 export async function categorizeWithClaude(title, content) {
   if (!process.env.ANTHROPIC_API_KEY) return null;
 
@@ -101,9 +51,10 @@ export async function categorizeWithClaude(title, content) {
   const msg = await client.messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 150,
-    messages: [{
-      role: 'user',
-      content: `Dado este artículo deportivo argentino, responde SOLO con:
+    messages: [
+      {
+        role: 'user',
+        content: `Dado este artículo deportivo argentino, responde SOLO con:
 1. La categoría más apropiada de: ${categories}, Deportes
 2. Un resumen en 1 oración (máx 100 caracteres)
 
@@ -111,7 +62,8 @@ Formato: CATEGORIA|RESUMEN
 
 Título: ${title}
 Contenido: ${content?.slice(0, 400) || ''}`,
-    }],
+      },
+    ],
   });
 
   const [category, summary] = msg.content[0].text.trim().split('|');
@@ -119,6 +71,6 @@ Contenido: ${content?.slice(0, 400) || ''}`,
   const cat = category?.trim();
   return {
     category: validCategories.includes(cat) ? cat : null,
-    summary:  summary?.trim() || null,
+    summary: summary?.trim() || null,
   };
 }

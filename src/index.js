@@ -1,9 +1,19 @@
-import { fetchSources, scrapeRSS, scrapeHTML, saveArticles } from './scraper.js';
-import { categorizeByKeywords, categorizeWithClaude, extractTags, simpleSummary } from './categorizer.js';
+import {
+  fetchSources,
+  scrapeRSS,
+  scrapeHTML,
+  saveArticles,
+} from './scraper.js';
+import {
+  categorizeByKeywords,
+  categorizeWithClaude,
+  extractTags,
+  simpleSummary,
+} from './categorizer.js';
 import { embedPendingArticles } from './embedder.js';
 import { semanticSearch, fullTextSearch, printResults } from './search.js';
 
-const [,, cmd, ...args] = process.argv;
+const [, , cmd, ...args] = process.argv;
 
 async function runScrape() {
   console.log('=== Scraper de Noticias Deportivas AR ===\n');
@@ -14,22 +24,29 @@ async function runScrape() {
 
   for (const source of sources) {
     try {
-      const raw = source.type === 'rss'
-        ? await scrapeRSS(source)
-        : await scrapeHTML(source);
+      const raw =
+        source.type === 'rss'
+          ? await scrapeRSS(source)
+          : await scrapeHTML(source);
 
       // Enriquecer con categoría, tags y resumen (secuencial para respetar rate limit)
       const enriched = [];
       for (const article of raw) {
-        const claudeResult = await categorizeWithClaude(article.title, article.content);
+        const claudeResult = await categorizeWithClaude(
+          article.title,
+          article.content,
+        );
         enriched.push({
           ...article,
-          category: claudeResult?.category || categorizeByKeywords(article.title, article.content),
-          summary:  claudeResult?.summary  || simpleSummary(article.content),
-          tags:     extractTags(article.title, article.content),
+          category:
+            claudeResult?.category ||
+            categorizeByKeywords(article.title, article.content),
+          summary: claudeResult?.summary || simpleSummary(article.content),
+          tags: extractTags(article.title, article.content),
         });
         // Delay para no exceder 50 req/min (~1.2s entre requests)
-        if (process.env.ANTHROPIC_API_KEY) await new Promise(r => setTimeout(r, 1300));
+        if (process.env.ANTHROPIC_API_KEY)
+          await new Promise((r) => setTimeout(r, 1300));
       }
 
       const { saved, skipped } = await saveArticles(enriched);
@@ -53,7 +70,7 @@ async function runEmbed() {
 
 async function runSearch() {
   const query = args.join(' ') || 'Messi gol';
-  const mode  = process.env.SEARCH_MODE || 'semantic';
+  const mode = process.env.SEARCH_MODE || 'semantic';
 
   if (mode === 'fulltext') {
     const results = await fullTextSearch(query);
@@ -69,8 +86,12 @@ const fn = commands[cmd];
 
 if (!fn) {
   console.log('Uso:');
-  console.log('  node src/index.js scrape          # Scrapea todas las fuentes');
-  console.log('  node src/index.js embed           # Genera embeddings pendientes');
+  console.log(
+    '  node src/index.js scrape          # Scrapea todas las fuentes',
+  );
+  console.log(
+    '  node src/index.js embed           # Genera embeddings pendientes',
+  );
   console.log('  node src/index.js search <query>  # Búsqueda semántica');
   process.exit(0);
 }

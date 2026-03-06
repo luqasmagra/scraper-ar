@@ -10,7 +10,7 @@ const parser = new RSSParser({
 
 const HEADERS = {
   'User-Agent': 'Mozilla/5.0 (compatible; NewsScraper/1.0)',
-  'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+  Accept: 'application/rss+xml, application/xml, text/xml, */*',
 };
 
 export async function fetchSources() {
@@ -25,14 +25,16 @@ export async function fetchSources() {
 export async function scrapeRSS(source) {
   console.log(`  Fetching RSS: ${source.name}`);
   const feed = await parser.parseURL(source.url);
-  return feed.items.map((item) => ({
-    source_id:    source.id,
-    title:        item.title?.trim() || '',
-    url:          item.link || item.guid || '',
-    content:      item.contentSnippet || item.content || item.summary || '',
-    author:       item['dc:creator'] || item.creator || null,
-    published_at: item.pubDate ? new Date(item.pubDate).toISOString() : null,
-  })).filter((a) => a.url && a.title);
+  return feed.items
+    .map((item) => ({
+      source_id: source.id,
+      title: item.title?.trim() || '',
+      url: item.link || item.guid || '',
+      content: item.contentSnippet || item.content || item.summary || '',
+      author: item['dc:creator'] || item.creator || null,
+      published_at: item.pubDate ? new Date(item.pubDate).toISOString() : null,
+    }))
+    .filter((a) => a.url && a.title);
 }
 
 export async function scrapeHTML(source) {
@@ -43,17 +45,29 @@ export async function scrapeHTML(source) {
   const articles = [];
 
   // Selectores genéricos para portadas de noticias
-  $('article, .post, .news-item, .article-item, [class*="article"], [class*="nota"]').each((_, el) => {
+  $(
+    'article, .post, .news-item, .article-item, [class*="article"], [class*="nota"]',
+  ).each((_, el) => {
     const $el = $(el);
     const titleEl = $el.find('h1, h2, h3, .title, [class*="title"]').first();
-    const linkEl  = $el.find('a[href]').first();
-    const title   = titleEl.text().trim();
-    const href    = linkEl.attr('href') || '';
-    const url     = href.startsWith('http') ? href : new URL(href, source.url).href;
-    const content = $el.find('p').map((_, p) => $(p).text().trim()).get().join(' ');
+    const linkEl = $el.find('a[href]').first();
+    const title = titleEl.text().trim();
+    const href = linkEl.attr('href') || '';
+    const url = href.startsWith('http') ? href : new URL(href, source.url).href;
+    const content = $el
+      .find('p')
+      .map((_, p) => $(p).text().trim())
+      .get()
+      .join(' ');
 
     if (title && url) {
-      articles.push({ source_id: source.id, title, url, content, published_at: null });
+      articles.push({
+        source_id: source.id,
+        title,
+        url,
+        content,
+        published_at: null,
+      });
     }
   });
 
@@ -69,5 +83,8 @@ export async function saveArticles(articles) {
     .select('id');
 
   if (error) throw error;
-  return { saved: data?.length || 0, skipped: articles.length - (data?.length || 0) };
+  return {
+    saved: data?.length || 0,
+    skipped: articles.length - (data?.length || 0),
+  };
 }
